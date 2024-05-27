@@ -1,0 +1,90 @@
+<!-- In your HTML file -->
+<!DOCTYPE html>
+{% load static %}
+<html>
+<head>
+    <title>Staff Availability</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="{% static 'styles.css' %}">
+</head>
+<body>
+
+    <div class="container">
+        <h1 class="title">Staff Availability</h1>
+        <div class="graph-container">
+            <canvas class="graph" id="chartJune8"></canvas>
+            <canvas class="graph" id="chartJune9"></canvas>
+        </div>
+    </div>
+
+    <script>
+        $.ajax({
+            url: "{% url 'staff_availability' %}",
+            success: function(data) {
+                var dataJune8 = data.map(item => {
+                    var availability = item.availabilities.find(a => a.startsWith('2024-06-08'));
+                    var hours = availability ? parseHours(availability) : 0;
+                    return { staff_member: item.name, availability_hours: hours, role: item.role };
+                });
+
+                var dataJune9 = data.map(item => {
+                    var availability = item.availabilities.find(a => a.startsWith('2024-06-09'));
+                    var hours = availability ? parseHours(availability) : 0;
+                    return { staff_member: item.name, availability_hours: hours, role: item.role };
+                });
+
+                createChart('chartJune8', dataJune8);
+                createChart('chartJune9', dataJune9);
+            }
+        });
+
+        function parseHours(availability) {
+            var times = availability.split(' - ')[1];
+            var start = parseInt(times.split(':')[0]);
+            var end = parseInt(times.split(' to ')[1].split(':')[0]);
+            return { start: start, end: end };
+        }
+
+        var roleColors = {
+            'Mentor': 'lightyellow',
+            'Judge': 'lightblue',
+            'Workshop Leader': 'lightcoral'
+        };
+
+        function createChart(canvasId, data) {
+            var ctx = document.getElementById(canvasId).getContext('2d');
+            data.forEach(item => {
+                console.log(item.role);
+            });
+            var backgroundColors = data.map(item => roleColors[item.role] || 'grey'); // default to grey if role is not found
+            var chart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: data.map(item => item.staff_member),
+                    datasets: [{
+                        label: 'Availability (hours)',
+                        backgroundColor: backgroundColors,
+                        data: data.map(item => [item.availability_hours.start - 8, item.availability_hours.end - 8])
+                    }]
+                },
+                    options: {
+                        indexAxis: 'y',
+                        scales: {
+                            x: {
+                                type: 'linear',
+                                min: 0,
+                                max: 13,
+                                ticks: {
+                                    callback: function(value, index, values) {
+                                        return (value + 8) + ':00';
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+        }
+    </script>
+</body>
+</html>
