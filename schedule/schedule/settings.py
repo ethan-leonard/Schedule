@@ -26,8 +26,9 @@ SECRET_KEY = 'django-insecure-!j7he&=(fuu!u)kxkmyr!u8d$gp&)n(om%44yu60f5r#2ly$&f
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['schedule-rptawbzcla-uc.a.run.app', 'schedule-rptawbzcla-uc.a.run.app/admin',]
 
+CSRF_TRUSTED_ORIGINS = ['https://schedule-rptawbzcla-uc.a.run.app']
 
 # Application definition
 
