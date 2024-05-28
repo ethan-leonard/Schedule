@@ -55,4 +55,4 @@ The backend of the project is located in the `schedule` directory.
     python manage.py runserver
     ```
 
-Now, you should be able to access the application at http://localhost:8000.
+Now, you should be able to access the application at http://localhost:8080.
